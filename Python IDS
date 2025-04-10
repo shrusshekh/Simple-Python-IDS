@@ -1,0 +1,18 @@
+from scapy.all import ARP, Ether, srp
+
+trusted_macs = ["dc:21:48:aa:7d:4b"]
+
+def scan():
+    ip_range = "10.0.0.0/24"
+    packet = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip_range)
+    result = srp(packet, timeout=2, verbose=0)[0]
+
+    for sent, received in result:
+        mac = received.hwsrc.lower()
+        ip = received.psrc
+        if mac not in trusted_macs:
+            print(f" ALERT: Untrusted device found! IP: {ip}, MAC: {mac}")
+        else:
+            print(f" Trusted device: IP: {ip}, MAC: {mac}")
+
+scan()
